@@ -16,17 +16,16 @@ class App < Sinatra::Base
 		return error
 	end
 
-	# get '/' do
-	# 	slim(:room, locals:{logged:session[:login]})
-	# end
+	get '/' do
+		slim(:home, locals:{logged:session[:login]})
+	end
 
 	get('/error') do
 		slim(:error)
 	end
 
-	get '/' do
-		# name =params[:id]
-		if session[:user_id] == true
+	get '/room' do
+		if session[:user_id]
 			if !request.websocket?
 				messages = db.execute("SELECT * FROM msg")
 				slim(:room, locals:{messages: messages}) 
@@ -40,7 +39,7 @@ class App < Sinatra::Base
 						EM.next_tick { settings.sockets.each{|s|
 							 s.send(session[:username].to_s + ":" + msg)}}
 						if msg.empty?
-							set_error('')
+							set_error('Skriv något')
 						else 
 							db.execute("INSERT INTO msg(username, message) VALUES (?, ?)", [session[:username], msg])
 						end 
@@ -83,15 +82,8 @@ class App < Sinatra::Base
 			set_error("Försök med ny användarnamn")
 			redirect('/error')
 		end
-        # email =params[:email]
-		# username = params[:username]
-        # password = params[:password]
-		# db.execute("INSERT INTO user(username, email, password) VALUES(?,?)", [ username, email, password])
-		# id = db.execute("SELECT id FROM login WHERE username =?", [username])
-		# session[:user_id] = id
-		# redirect("/")
-	end
-	
+	end 
+
 	get '/login' do
 		slim(:login, locals:{logged:session[:user_id]})
 	end
@@ -102,15 +94,13 @@ class App < Sinatra::Base
 		login_password = params["login_password"]
 		
 		result = db.execute("SELECT user_id,crypt_password FROM user WHERE username	=?", [login_username])
-		print result
+		# print result
 		if result.empty?
 			set_error('Det finns inget sådant användarnamn')
 			redirect("/error")
 		else
-			# id = result.first["user_id"]	
 			crypt_password = result.first["crypt_password"]
 			if BCrypt::Password.new(crypt_password) == login_password
-				# session[:user_id] = id
 				session[:user_id] = true
 				session[:username] = login_username
 				redirect('/')
@@ -118,23 +108,16 @@ class App < Sinatra::Base
 				redirect('/error')
 			end
 		end
-		# password= db.execute("SELECT crypt_password FROM user WHERE username =?", login_username )[0][0]
-		# login_password = BCrypt::Password.new(password)
-
-		# if login_username ==  password == login_password 
-		# 	redirect("/")
-		# 	session[:login]=true
-		# else
-		# 	redirect("/")
-		# end
 	end 
+
+	get '/profile' do
+			profile = db.execute("SELECT * FROM user WHERE username =?", session[:username])
+			slim(:profile, locals:{profile: profile})
+	end
 	
 	post '/logout' do
 		session[:user_id] = false
-		# session.destroy
 		redirect("/") 
 	end
-
-
 
 end           

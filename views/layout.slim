@@ -15,35 +15,26 @@ html lang="en"
     body
         header
             nav
-                div class="nav-wrapper"
-                    a href="" class="brand-logo" Logo
-                    a href="#" data-activates="mobile-demo" class="button-collapse" 
-                        i class="material-icons" menu
+                div class="amber nav-wrapper "
+                    a href="/" class="brand-logo center" 
+                        i class="material-icons" home
                     ul id="nav-mobile" class="right hide-on-med-and-down"
                         -if session[:user_id]
-                            form action="/logout" method="POST"
+                            form  action="/logout" method="POST"
                                 li 
-                                    button class="btn waves-effect waves-light" type="submit" value="Logout" logga ut 
+                                    a class="btn waves-effect orange" type="submit" name="commit" value="Logout" logga ut 
+                                    a class="btn waves-effect orange" href="/room" Börja Chatta 
+                                    a class="btn waves-effect orange" href="/profile" Profile
                         -else
                             li 
-                                a href="/login" Logga in 
+                                a class="btn waves-effect orange" href="/login" Logga in 
                             li 
-                                a href="/register" Skapa konto     
+                                a class="btn waves-effect orange" href="/register" Skapa konto     
                             li
-                                a href="#" Om oss 
-                    ul class="side-nav " id="mobile-demo"        
-                        -if session[:user_id]
-                            form action="/logout" method="POST"
-                               li 
-                                    button class="btn waves-effect waves-light" type="submit" value="Logout" logout
-                        -else
-                            li 
-                                a href="/login" Logga in 
-                            li 
-                                a href="/register" Skapa konto     
-                            li
-                                a href="#" Om oss
+                                a class="btn waves-effect orange" href="#" Om oss 
+
         main 
-            ==yield
+            div class="container" 
+                ==yield
         
         script src="/js/main.js"

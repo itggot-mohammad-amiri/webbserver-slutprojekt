@@ -21,10 +21,10 @@ window.onload = function(){
 
       var sender = function(f){
         var input     = document.getElementById('input');
-        input.onclick = function(){ input.value = " " };
+        input.onclick = function(){ input.value = "" };
         f.onsubmit    = function(){
           ws.send(input.value);
-          input.value = " ";
+          input.value = "";
           return false;
         }
       }(document.getElementById('form'));
