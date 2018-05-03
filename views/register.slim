@@ -1,19 +1,27 @@
 div class="row"
     form class="col s12" action="/register" method="post"
         div class="row"
-            div class="input-field col s6"
-                input id="first_name" type="text" class="validate" 
-                label for="first_name" Användarnamn 
-            div class="input-field col s6"
-                input id="last_name" type="text" class="validate"
-                label for="last_name" 
+            div class="input-field col s12"
+                input id="username" name="username" type="text" class="validate" Username
+                / label for="username"  
         div class="row"
             div class="input-field col s12"
-                input id="email" type="email" class="validate"reqiured='true'
-                label for="email" Email
+                input id="email" name="email" type="email" class="validate"reqiured='true'Email
+                / label for="email" 
         div class="row"
             div class="input-field col s12"
-                input id="password" type="password" class="validate" reqiured='true'
-                label for="password" Lösenord
+                input id="password1" name="password1" type="password" class="validate" reqiured='true'Lösenord
+                / label for="password"
+        div class="row"
+            div class="input-field col s12"
+                input id="password2" name="password2" type="password" class="validate" reqiured='true'Lösenord
+                / label for="password"
 
         input type="submit" value="Skapakonto"
+
+/ form.login-form action="/register" method="POST"
+/     input type="text" name="username" placeholder="Username"
+/     input type="password" name="password1" placeholder="Password"
+/     input type="password" name="password2" placeholder="Confirm Password"
+/     input type="submit" value="Register"
+/ a href="/" Back

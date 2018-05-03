@@ -1,0 +1,11 @@
+
+/ <h1>room #{name}
+h5 ny chat 
+/ form id="form" action="/room/#{name}" method="GET" 
+        input type="text" id="input" value="send a message" name="message" 
+form id="form" method="GET" 
+        input type="text" id="input" value="send a message" name="message"     
+div id="msgs"
+        h5 chat historik
+        - messages.each do |a|
+                p #{a[1]}: #{a[2]}
