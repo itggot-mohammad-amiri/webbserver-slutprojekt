@@ -20,11 +20,12 @@ html lang="en"
                         i class="material-icons" home
                     ul id="nav-mobile" class="right hide-on-med-and-down"
                         -if session[:user_id]
-                            form  action="/logout" method="POST"
-                                li 
-                                    a class="btn waves-effect orange" type="submit" name="commit" value="Logout" logga ut 
-                                    a class="btn waves-effect orange" href="/room" Börja Chatta 
-                                    a class="btn waves-effect orange" href="/profile" Profile
+                            li 
+                                 a class="btn waves-effect orange" href="/profile" Ditt konto
+                            li 
+                                form  action="/logout" method="POST"
+                                    input class="btn waves-effect orange" type="submit" name="commit" value="Logout"
+                               
                         -else
                             li 
                                 a class="btn waves-effect orange" href="/login" Logga in 

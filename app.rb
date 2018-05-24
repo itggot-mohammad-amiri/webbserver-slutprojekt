@@ -1,10 +1,12 @@
+require_relative 'module.rb'
 class App < Sinatra::Base
+	include ChatDB
 	enable:sessions
 	
 	set :server, 'thin'
 	set :sockets, []
 
-    db = SQLite3::Database.new("db/table.sqlite") 
+	# db = SQLite3::Database.new("db/table.sqlite") 
 
 	def set_error(error_message)
 		session[:error] = error_message
@@ -27,7 +29,8 @@ class App < Sinatra::Base
 	get '/room' do
 		if session[:user_id]
 			if !request.websocket?
-				messages = db.execute("SELECT * FROM msg")
+				# messages = db.execute("SELECT * FROM msg")
+				messages = db_message() 
 				slim(:room, locals:{messages: messages}) 
 			else
 				request.websocket do |ws|
@@ -41,7 +44,8 @@ class App < Sinatra::Base
 						if msg.empty?
 							set_error('Skriv något')
 						else 
-							db.execute("INSERT INTO msg(username, message) VALUES (?, ?)", [session[:username], msg])
+							# db.execute("INSERT INTO msg(username, message) VALUES (?, ?)", [session[:username], msg])
+							db_nwmsg(session[:username], msg)
 						end 
 					end
 					ws.onclose do
@@ -66,35 +70,82 @@ class App < Sinatra::Base
         password1 = params["password1"]
 		password2 = params["password2"]
 
-		test = db.execute("SELECT user_id FROM user WHERE username=?", [username])
-		
+		# test = db.execute("SELECT user_id FROM user WHERE username=?", [username])
+		test = db_reg(username)
+
 		if test.empty?
 			if password1 == password2
 				crypt_password = BCrypt::Password.create(password1)
 				
-				db.execute("INSERT INTO user(username, email, crypt_password) VALUES (?,?,?)", [username, email, crypt_password])
+				# db.execute("INSERT INTO user(username, email, crypt_password) VALUES (?,?,?)", [username, email, crypt_password])
+				db_reg2(username, email, crypt_password)
 				redirect('/')
 			else
-				set_error('Din lösenord är felaktigt')
+				set_error('Ogiltig användarnamn eller lösenord')
 				redirect('/error')
 			end
 		else
-			set_error("Försök med ny användarnamn")
+			set_error("Ogiltig användarnamn eller lösenord")
 			redirect('/error')
 		end
 	end 
+
+	get '/users' do
+		if session[:user_id] 
+			users = db_users()
+			user1 = db_getid(session[:username]).join.to_i
+			list = relation(user1)
+			slim(:user, locals:{users: users, list:list, user1:user1})
+		else
+			set_error("Du behöver logga in")
+			redirect('/error')
+		end 
+	end
+
+	post '/users/add/:id' do
+		if session[:username] != nil  
+			user2 = params[:id].to_i
+			user1 = db_getid(session[:username]).join.to_i
+			list = relation(user1)	
+			if list.include?(user2.to_s) || user1 == user2
+				set_error("Ni är redanveänner")
+				redirect("/error")
+			else
+				db_addfriend(user1, user2)
+				p list
+			end 
+			
+		
+		end 
+		redirect("/users")
+	end
+	
+	# get '/friend' do
+	# 	user1 = db_getid(session[:username])
+	# 	relation = relation(user1)
+	# end 
+
+	get '/profile' do
+		if session[:user_id] 
+			profile = db_profile(session[:username])
+			slim(:profile, locals:{profile: profile})
+		else
+			set_error("Du behöver logga in")
+			redirect('/error')
+		end 
+	end
 
 	get '/login' do
 		slim(:login, locals:{logged:session[:user_id]})
 	end
 
 	post '/login' do
-		db.results_as_hash = true
+		# db.results_as_hash = true
 		login_username = params["login_email"]
 		login_password = params["login_password"]
 		
-		result = db.execute("SELECT user_id,crypt_password FROM user WHERE username	=?", [login_username])
-		# print result
+		result = db_login(login_username) 
+		# result = db.execute("SELECT user_id,crypt_password FROM user WHERE username	=?", [login_username])
 		if result.empty?
 			set_error('Det finns inget sådant användarnamn')
 			redirect("/error")
@@ -109,11 +160,6 @@ class App < Sinatra::Base
 			end
 		end
 	end 
-
-	get '/profile' do
-			profile = db.execute("SELECT * FROM user WHERE username =?", session[:username])
-			slim(:profile, locals:{profile: profile})
-	end
 	
 	post '/logout' do
 		session[:user_id] = false

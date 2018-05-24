@@ -1,6 +1,8 @@
 h1 class="center-align" Välkomen till chattrum!
-
--if session[:user_id]
-    a class="center-align waves-effect waves-light btn-large" href="/room" Börja Chatta 
-                      
+div class="row"
+    -if session[:user_id]
+        div class="col s6"
+            a class="center-align waves-effect waves-light btn-large" href="/room" Börja Chatta 
+        div class="col s6"
+            a class="center-align waves-effect waves-light btn-large" href="/users" Alla användare                   
                         

@@ -1,0 +1,21 @@
+-if session[:user_id]
+    table 
+        thead
+            th Users 
+            th Email
+            th Lägg som vän 
+        -users.each do |a|
+            tr 
+                td #{a[1]}
+                td #{a[2]}
+                - if a[0] != user1
+                    - if list.include?(a[0].to_s) == false
+                        td
+                            form action="/users/add/#{a[0]}" method="post"
+                                input class="btn waves-effect orange" type="submit" name="commit" value="lägg som vän"
+                    -else
+                        td 
+                            p Vänner
+                -else 
+                    td 
+                        p Ditt konto
